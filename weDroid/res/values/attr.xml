@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="wedroid_loading_text_color" format="color|reference" />
+
+    <declare-styleable name="wedroid_loading_dialog">
+        <attr name="wedroid_loading_text_color" />
+    </declare-styleable>
+</resources>

@@ -1,0 +1,116 @@
+package com.wedroid.framework.v2.module.imageLoader;
+
+import java.io.File;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+
+import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiscCache;
+import com.nostra13.universalimageloader.cache.disc.naming.HashCodeFileNameGenerator;
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.DisplayImageOptions.Builder;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.decode.BaseImageDecoder;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
+import com.nostra13.universalimageloader.utils.StorageUtils;
+
+/**
+ * 图片加载器，可加载网络图片和缓存、本地图片，并对这些图片进行相应的缓存 显示图片所使用的uri：
+ * 
+ * String imageUri = "http://site.com/image.png"; // from Web String imageUri
+ * ="file:///mnt/sdcard/image.png"; // from SD card String imageUri
+ * ="content://media/external/audio/albumart/13"; // from content provider
+ * String imageUri = "assets://image.png"; // from assets String imageUri =
+ * "drawable://" + R.drawable.image; // from drawables (only images, non-9patch)
+ * 
+ */
+public class WeDroidImageLoaderConfig {
+	private static ImageLoaderConfiguration imageLoaderConfiguration;
+	// private static SKImageLoaderConfig imageLoader;
+	private static File cacheDir;
+	private static DisplayImageOptions options;
+	private static Builder builder;
+
+	private WeDroidImageLoaderConfig() {
+
+	}
+	/**
+	 * 初始化配置
+	 * 
+	 * @param context
+	 *            上下文
+	 *
+	 * @return 图片加载器
+	 */
+	public static void initImageLoaderConfiguration(Context context) {
+		// if(imageLoader == null){
+		// imageLoader = new SKImageLoaderConfig();
+		cacheDir = StorageUtils.getCacheDirectory(context);
+		imageLoaderConfiguration = new ImageLoaderConfiguration.Builder(context)
+				.threadPoolSize(20).threadPriority(Thread.NORM_PRIORITY - 1)
+				// default
+				.tasksProcessingOrder(QueueProcessingType.FIFO)
+				// default 先进先出
+				.denyCacheImageMultipleSizesInMemory()
+				.memoryCache(new LruMemoryCache(2 * 1024 * 1024)) // 最近最久未使用
+				.memoryCacheSize(4 * 1024 * 1024)// 内存的缓存 4M
+				.discCache(new UnlimitedDiscCache(cacheDir)) // default
+																// UnlimitedDiscCache
+				.discCacheSize(100 * 1024 * 1024) // 硬盘缓存的大小 100M
+				// .discCacheFileCount(100) //By default: disc cache is
+				// unlimited.
+				.discCacheFileNameGenerator(new HashCodeFileNameGenerator()) // default
+				.imageDownloader(new BaseImageDownloader(context)) // default
+				.imageDecoder(new BaseImageDecoder()) // default
+				.defaultDisplayImageOptions(DisplayImageOptions.createSimple()) // default
+
+				// .enableLogging()
+				.build();
+		builder = new DisplayImageOptions.Builder();
+		options = builder
+				// .showStubImage(R.drawable.ic_launcher)// 在ImageView加载过程中显示图片
+				// .showImageForEmptyUri(R.drawable.ic_launcher) // image连接地址为空时
+				// .showImageOnFail(R.drawable.ic_launcher) // image加载失败
+				.cacheInMemory().cacheOnDisc()
+				.displayer(new RoundedBitmapDisplayer(2)) // 加载图片的task，以圆角显示图片
+				.imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2) // 图片缩放类型
+				.bitmapConfig(Bitmap.Config.RGB_565).build();
+		// }
+		// return imageLoader;
+	}
+
+	
+	public static void initImageShow(int resId){
+		if(builder!=null){
+			 builder.showStubImage(resId)// 在ImageView加载过程中显示图片
+			 .showImageForEmptyUri(resId) // image连接地址为空时
+			.showImageOnFail(resId) ;// image加载失败
+		}
+	}
+	/**
+	 * 得到一个图片加载配置管理器imageLoaderConfiguration，在imageLoaderConfiguration中可以
+	 * 对图片加载的方式以及存储等进行相应的配置
+	 * 
+	 * @return 图片加载配置管理器
+	 */
+	public static ImageLoaderConfiguration getImageLoaderConfiguration(
+			Context context) {
+		imageLoaderConfiguration = null;
+		initImageLoaderConfiguration(context);
+		return imageLoaderConfiguration;
+	}
+
+	/**
+	 * 得到图片显示选项DisplayImageOptions，DisplayImageOptions规定了图片在哪里显示， 以何种方式显示
+	 *
+	 * @return 图片显示选项
+	 */
+	public static DisplayImageOptions getDisplayOptions() {
+		return options;
+	}
+
+}

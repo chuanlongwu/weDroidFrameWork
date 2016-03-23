@@ -1,0 +1,9 @@
+-libraryjars /libs/alibaba.jar
+-libraryjars /libs/bcprov-jdk14-123.jar
+-libraryjars /libs/sun.misc.BASE64Decoder.jar
+-libraryjars /libs/commons-codec.jar
+-libraryjars /libs/httpclient-4.3.4.jar
+-libraryjars /libs/httpcore-4.3.2.jar
+-libraryjars /libs/httpmime-4.3.4.jar
+-libraryjars /libs/universal-image-loader-1.8.4-with-sources.jar
+-keep class org.bouncycastle.** { *;} 
